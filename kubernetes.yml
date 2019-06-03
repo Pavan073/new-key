@@ -1,0 +1,53 @@
+---
+- hosts: all
+  become: yes
+  remote_user: ec2-user
+  tasks:
+  - name: Adding lines into bashrc file
+    lineinfile:
+      path: ~/.bashrc
+      line: 'NAME=wiprocluster.wipjenkins.uk'
+
+  - name: Adding lines into bashrc file
+    lineinfile:
+      path: ~/.bashrc
+      line: 'ZONES=us-west-2a,us-west-2b,us-west-2c'
+
+  - name: Check if the key file exists
+    stat:
+      path: /root/.ssh/id_rsa.pub
+    register: result
+    delegate_to: 127.0.0.1
+
+  - name: Fetch the public key
+    shell: cat /root/.ssh/id_rsa.pub
+    register: ssh_key
+    when: result.stat.exists == true
+    delegate_to: 127.0.0.1
+
+  - name: Generate private/public RSA host key
+    command : ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -C "" -N ""
+    register: new_ssh_key
+    delegate_to: 127.0.0.1
+    when: result.stat.exists == false
+
+#    ignore_errors: yes - name: Copy SSH key to remote_node
+#    lineinfile:
+#      path: /root/.ssh/authorized_keys
+#      line: "{{ new_ssh_key.stdout }}"
+#      state: present
+
+  - name: Creating kubernetes cluster
+    command: kops create cluster --node-count 3 --master-zones $ZONES --zones $ZONES --topology private --dns-zone cloudbees.be --networking weave --node-size m4.large --master-size  m4.large --name $${NAME}
+
+  - name: Updating cluster
+    command: kops update cluster $NAME --yes
+
+  - name: Validate cluster
+    command: kops validate cluster $NAME
+
+  - name: Export commands
+    command: export ZONES=us-west-2a,us-west-2b,us-west-2c
+
+  - name: Export commands
+    command: export NAME=wiprocluster.cloudbees.be
