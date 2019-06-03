@@ -20,16 +20,16 @@
     when: result.stat.exists == false
 
   - name: Export commands
-    command: export ZONES=us-west-2a,us-west-2b,us-west-2c
+    shell: export ZONES=us-west-2a,us-west-2b,us-west-2c
 
   - name: Export commands
-    command: export NAME=wiprocluster.cloudbees.be
+    shell: export NAME=wiprocluster.cloudbees.be
   
   - name: Creating kubernetes cluster
-    command: kops create cluster --node-count 3 --master-zones $ZONES --zones $ZONES --topology private --dns-zone cloudbees.be --networking weave --node-size m4.large --master-size  m4.large --name $${NAME}
+    shell: kops create cluster --node-count 3 --master-zones $ZONES --zones $ZONES --topology private --dns-zone cloudbees.be --networking weave --node-size m4.large --master-size  m4.large --name $${NAME}
     
   - name: Updating cluster
-    command: kops update cluster $NAME --yes
+    shell: kops update cluster $NAME --yes
 
   - name: Validate cluster
-    command: kops validate cluster $NAME  
+    shell: kops validate cluster $NAME  
