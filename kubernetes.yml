@@ -12,17 +12,9 @@
     lineinfile:
       path: ~/.bashrc
       line: 'ZONES=us-west-2a,us-west-2b,us-west-2c'
+      
   - name: Export commands
     shell: export ZONES=us-west-2a,us-west-2b,us-west-2c
 
   - name: Export commands
-    shell: export NAME=wiprocluster.cloudbees.be
-  
-  - name: Creating kubernetes cluster
-    shell: kops create cluster --node-count 3 --master-zones $ZONES --zones $ZONES --topology private --dns-zone cloudbees.be --networking weave --node-size m4.large --master-size  m4.large --name $${NAME}
-    
-  - name: Updating cluster
-    shell: kops update cluster $NAME --yes
-
-  - name: Validate cluster
-    shell: kops validate cluster $NAME  
+    shell: export NAME=wiprocluster.wipjenkins.uk
