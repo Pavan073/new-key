@@ -12,13 +12,6 @@
     lineinfile:
       path: ~/.bashrc
       line: 'ZONES=us-west-2a,us-west-2b,us-west-2c'
-
-  - name: Generate private/public RSA host key
-    command : ssh-keygen -q -t rsa -f /root/.ssh/id_rsa -C "" -N ""
-    register: new_ssh_key
-    delegate_to: 127.0.0.1
-    when: result.stat.exists == false
-
   - name: Export commands
     shell: export ZONES=us-west-2a,us-west-2b,us-west-2c
 
